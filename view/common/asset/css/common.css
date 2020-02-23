@@ -1,0 +1,80 @@
+.content {
+	padding: 20px 20px 70px 20px;
+}
+
+.mb20 {
+	margin-bottom: 20px;
+}
+
+.table thead th,
+.table tbody td {
+	text-align: center !important;
+	vertical-align: middle !important;
+}
+
+.table tbody td.text-left {
+	text-align: left !important;
+}
+
+.form-inline .input-group {
+	margin-right: 20px;
+}
+
+.pagination {
+	margin: 0;
+}
+
+.image-list {
+	overflow-x: scroll;
+	white-space: nowrap;
+}
+
+.image-upload {
+	width: 100px;
+	height: 100px;
+	border: 2px solid #EEEEEE;
+	cursor: pointer;
+	position: relative;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.image-upload span {
+	color: #EEEEEE;
+	font-size: 50px;
+	line-height: 50px;
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	margin-left: -25px;
+	margin-top: -25px;
+}
+
+.image {
+	height: 100px;
+	margin-left: 10px;
+	position: relative;
+	vertical-align: top;
+	display: inline-block;
+}
+
+.image img {
+	height: 100%;
+}
+
+.image span {
+	color: #FF0000;
+	cursor: pointer;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+}
+
+.thumb {
+	height: 100px;
+}
+
+.input-attr span {
+	color: #FF0000;
+	cursor: pointer;
+}

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<!-- 区块-标题 -->
+		<title>
+			<block name="title"></block>
+		</title>
+		<!-- 引入-样式 -->
+		<include file="common/style" />
+		<!-- 引入-脚本 -->
+		<include file="common/script" />
+		<!-- 区块-样式 -->
+		<block name="style"></block>
+	</head>
+	<body>
+		<div class="content">
+			<!-- 引入-导航 -->
+			<include file="common/nav" />
+			<!-- 区块-内容 -->
+			<block name="content"></block>
+		</div>
+	</body>
+	<!-- 区块-脚本 -->
+	<block name="script"></block>
+	<!-- 禁用自动完成 -->
+	<script type="text/javascript">
+		$("input[type='text']").attr("autocomplete", "off")
+	</script>
+</html>
