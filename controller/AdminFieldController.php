@@ -9,187 +9,6 @@ use think\Db;
 
 class AdminFieldController extends PluginAdminBaseController
 {
-    /*获取添加字段语句*/
-    protected function getAddSql($model_field, $field)
-    {
-        /*获取表前缀*/
-        $prefix = config("database.prefix") . "content_model_";
-        /*处理字段默认*/
-        if (!empty($field["default"])) {
-            $field["default"] = "DEFAULT '{$field['default']}'";
-        }
-        /*处理字段类型*/
-        switch ($field["type"]) {
-            case 1:
-                $field["type"] = "int";
-                break;
-            case 2:
-                $field["type"] = "varchar({$field['length']})";
-                break;
-            case 3:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 4:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 5:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 6:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 7:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 8:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 9:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 10:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-        }
-        /*处理字段注释*/
-        $field["comment"] = "COMMENT '{$field['name']}'";
-        /*获取语句*/
-        $sql = "ALTER TABLE {$prefix}{$model_field} ADD {$field['field']} {$field['type']} {$field['default']} {$field['comment']}";
-        return $sql;
-    }
-
-    /*获取修改字段语句（重名字段）*/
-    protected function getChangeSql($model_field, $field)
-    {
-        /*获取表前缀*/
-        $prefix = config("database.prefix") . "content_model_";
-        /*处理字段默认*/
-        if (!empty($field["default"])) {
-            $field["default"] = "DEFAULT '{$field['default']}'";
-        }
-        /*处理字段类型*/
-        switch ($field["type"]) {
-            case 1:
-                $field["type"] = "int";
-                break;
-            case 2:
-                $field["type"] = "varchar({$field['length']})";
-                break;
-            case 3:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 4:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 5:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 6:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 7:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 8:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 9:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 10:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-        }
-        /*处理字段注释*/
-        $field["comment"] = "COMMENT '{$field['name']}'";
-        /*获取语句*/
-        $sql = "ALTER TABLE {$prefix}{$model_field} CHANGE {$field['field_origin']} {$field['field']} {$field['type']} {$field['default']} {$field['comment']}";
-        return $sql;
-    }
-
-    /*获取修改字段语句（不重名字段）*/
-    protected function getModifySql($model_field, $field)
-    {
-        /*获取表前缀*/
-        $prefix = config("database.prefix") . "content_model_";
-        /*处理字段默认*/
-        if (!empty($field["default"])) {
-            $field["default"] = "DEFAULT '{$field['default']}'";
-        }
-        /*处理字段类型*/
-        switch ($field["type"]) {
-            case 1:
-                $field["type"] = "int";
-                break;
-            case 2:
-                $field["type"] = "varchar({$field['length']})";
-                break;
-            case 3:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 4:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 5:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 6:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 7:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 8:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 9:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-            case 10:
-                $field["type"] = "text";
-                $field["default"] = "";
-                break;
-        }
-        /*处理字段注释*/
-        $field["comment"] = "COMMENT '{$field['name']}'";
-        /*获取语句*/
-        $sql = "ALTER TABLE {$prefix}{$model_field} MODIFY {$field['field']} {$field['type']} {$field['default']} {$field['comment']}";
-        return $sql;
-    }
-
-    /*获取删除字段语句*/
-    protected function getDropSql($model_field, $field_field)
-    {
-        /*获取表前缀*/
-        $prefix = config("database.prefix") . "content_model_";
-        /*获取语句*/
-        $sql = "ALTER TABLE {$prefix}{$model_field} DROP {$field_field}";
-        return $sql;
-    }
-
     public function index()
     {
         /*获取模型编号*/
@@ -221,12 +40,20 @@ class AdminFieldController extends PluginAdminBaseController
         $params = input("post.params/a");
         /*判断请求参数*/
         if (!empty($submit)) {
-            /*获取字段键名*/
+            /*处理字段数据*/
+            if (empty($params["length"])) {
+                $params["length"] = 0;
+            }
+            /*获取模型键名*/
             $model_field = (new ContentModelModel())->where("id", $params["model_id"])->value("field");
             /*添加字段数据*/
             ContentFieldModel::create($params, true);
-            /*添加字段*/
-            Db::execute($this->getAddSql($model_field, $params));
+            /*获取语句*/
+            $sql = ContentFieldModel::getSql("add", [
+                "model_field" => $model_field
+            ], $params);
+            /*执行语句*/
+            Db::execute($sql);
             return true;
         } else {
             return $this->fetch();
@@ -258,12 +85,21 @@ class AdminFieldController extends PluginAdminBaseController
             ], true);
             /*判断字段键名变化*/
             if ($field_field != $field_field_origin) {
-                /*修改字段（重名字段）*/
+                /*处理数据*/
                 $params["field_origin"] = $field_field_origin;
-                Db::execute($this->getChangeSql($model_field, $params));
+                /*获取语句*/
+                $sql = ContentFieldModel::getSql("change", [
+                    "model_field" => $model_field
+                ], $params);
+                /*执行语句*/
+                Db::execute($sql);
             } else {
-                /*修改字段（不重名字段）*/
-                Db::execute($this->getModifySql($model_field, $params));
+                /*获取语句*/
+                $sql = ContentFieldModel::getSql("modify", [
+                    "model_field" => $model_field
+                ], $params);
+                /*执行语句*/
+                Db::execute($sql);
             }
             return true;
         } else {
@@ -290,9 +126,15 @@ class AdminFieldController extends PluginAdminBaseController
                 /*获取字段键名*/
                 $field_field = (new ContentFieldModel())->where("id", $id)->value("field");
                 /*删除字段数据*/
-                ContentModelModel::destroy($id);
-                /*删除表*/
-                Db::execute($this->getDropSql($model_field, $field_field));
+                ContentFieldModel::destroy($id);
+                /*获取语句*/
+                $sql = ContentFieldModel::getSql("drop", [
+                    "model_field" => $model_field
+                ], [
+                    "field" => $field_field
+                ]);
+                /*执行语句*/
+                Db::execute($sql);
             }
             return true;
         }
@@ -310,7 +152,7 @@ class AdminFieldController extends PluginAdminBaseController
          */
         if (!empty($id) && !empty($sort)) {
             /*修改字段数据*/
-            ContentModelModel::update([
+            ContentFieldModel::update([
                 "sort" => $sort
             ], [
                 "id" => $id
@@ -331,7 +173,7 @@ class AdminFieldController extends PluginAdminBaseController
          */
         if (!empty($id) && !empty($status)) {
             /*修改字段数据*/
-            ContentModelModel::update([
+            ContentFieldModel::update([
                 "status" => $status
             ], [
                 "id" => $id
@@ -353,9 +195,15 @@ class AdminFieldController extends PluginAdminBaseController
             /*获取字段键名*/
             $field_field = (new ContentFieldModel())->where("id", $id)->value("field");
             /*删除字段数据*/
-            ContentModelModel::destroy($id);
-            /*删除表*/
-            Db::execute($this->getDropSql($model_field, $field_field));
+            ContentFieldModel::destroy($id);
+            /*获取语句*/
+            $sql = ContentFieldModel::getSql("drop", [
+                "model_field" => $model_field
+            ], [
+                "field" => $field_field
+            ]);
+            /*执行语句*/
+            Db::execute($sql);
             return true;
         }
     }

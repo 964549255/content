@@ -1,0 +1,178 @@
+<extend name="common/frame" />
+
+<!-- 区块-标题 -->
+<block name="title">
+	字段管理
+</block>
+
+<!-- 区块-样式 -->
+<block name="style">
+
+</block>
+
+<!-- 区块-内容 -->
+<block name="content">
+	<table class="table table-bordered table-hover">
+		<colgroup>
+			<col width="5%">
+			<col width="10%">
+			<col width="7.5%">
+			<col width="10%">
+			<col width="10%">
+			<col width="10%">
+			<col width="10%">
+			<col width="7.5%">
+			<col width="10%">
+			<col width="20%">
+		</colgroup>
+		<thead>
+			<tr>
+				<th><input type="checkbox" id="all" onchange="changeAll()"></th>
+				<th>字段排序</th>
+				<th>字段编号</th>
+				<th>字段名称</th>
+				<th>字段键名</th>
+				<th>字段类型</th>
+				<th>字段默认</th>
+				<th>字段长度</th>
+				<th>字段状态</th>
+				<th><button class="btn btn-success" type="button" onclick="add()">添加字段</button></th>
+			</tr>
+		</thead>
+		<tbody>
+			<volist name="datas" id="data">
+				<tr>
+					<td>
+						<if condition="$data.vital != 1">
+							<input type="checkbox" name="deleteId" value="{$data.id}">
+						</if>
+					</td>
+					<td><input type="text" class="form-control text-center" value="{$data.sort}" onchange="changeSort(this, {$data.id}, '{:cmf_plugin_url('Content://admin_field/changeSort')}')"></td>
+					<td>{$data.id}</td>
+					<td>{$data.name}</td>
+					<td>{$data.field}</td>
+					<td>{$data.type_text}</td>
+					<td>{$data.default}</td>
+					<td>{$data.length}</td>
+					<td>
+						<if condition="$data.vital != 1">
+							<switch name="$data.status">
+								<case value="1">
+									<button class="btn btn-warning" type="button" onclick="changeStatus(2, {$data.id}, '{:cmf_plugin_url('Content://admin_field/changeStatus')}', '确认禁用字段?')">禁用字段</button>
+								</case>
+								<case value="2">
+									<button class="btn btn-success" type="button" onclick="changeStatus(1, {$data.id}, '{:cmf_plugin_url('Content://admin_field/changeStatus')}', '确认启用字段?')">启用字段</button>
+								</case>
+							</switch>
+						</if>
+					</td>
+					<td>
+						<if condition="$data.vital != 1">
+							<button class="btn btn-primary" type="button" onclick="edit({$data.id})">修改字段</button>
+							<button class="btn btn-danger" type="button" onclick="destroy({$data.id}, '{:cmf_plugin_url('Content://admin_field/destroy')}', '确认删除字段?')">删除字段</button>
+						</if>
+					</td>
+				</tr>
+			</volist>
+		</tbody>
+	</table>
+	<div class="row">
+		<div class="col-md-2">
+			<button class="btn btn-danger" type="button" onclick="deleteAll('{:cmf_plugin_url('Content://admin_field/deleteAll')}', '确认删除选中?')">删除选中</button>
+		</div>
+		<div class="col-md-10">
+			<div class="text-right">{$pages}</div>
+		</div>
+	</div>
+</block>
+
+<!-- 区块-脚本 -->
+<block name="script">
+	<script type="text/javascript">
+		/* 添加字段 */
+		function add() {
+			let title = "字段添加"
+			let url = `{:cmf_plugin_url('Content://admin_field/add')}`
+			iframe(title, url, function(index, layero) {
+				let form = layer.getChildFrame("form", index)
+				let iframeWin = window[layero.find('iframe')[0]['name']]
+				let params = {
+					submit: "submit",
+					params: {
+						name: form.find("#name").val(),
+						field: form.find("#field").val(),
+						type: form.find("#type").val(),
+						default: form.find("#default").val(),
+						length: form.find("#length").val(),
+						model_id: "{$model_id}",
+					}
+				}
+				if (isNull(params.params.name)) {
+					msg("字段名称为空")
+					return false
+				}
+				if (isNull(params.params.field)) {
+					msg("字段键名为空")
+					return false
+				}
+				if (params.params.length == "") {
+					msg("字段长度为空")
+					return false
+				}
+				let indexLoad = layer.load(2)
+				$.post(url, params, function(data) {
+					if (data == true) {
+						layer.close(indexLoad)
+						layer.close(index)
+						location.reload()
+					}
+				})
+			})
+		}
+
+		/* 修改字段 */
+		function edit(id) {
+			let title = "字段修改"
+			let url = `{:cmf_plugin_url('Content://admin_field/edit')}?id=${id}`
+			iframe(title, url, function(index, layero) {
+				let form = layer.getChildFrame("form", index)
+				let iframeWin = window[layero.find('iframe')[0]['name']]
+				let params = {
+					submit: "submit",
+					params: {
+						name: form.find("#name").val(),
+						field: form.find("#field").val(),
+						type: form.find("#type").val(),
+						default: form.find("#default").val(),
+						length: form.find("#length").val(),
+						model_id: "{$model_id}",
+					}
+				}
+				if (isNull(params.params.name)) {
+					msg("字段名称为空")
+					return false
+				}
+				if (isNull(params.params.field)) {
+					msg("字段键名为空")
+					return false
+				}
+				if (params.params.length == "") {
+					msg("字段长度为空")
+					return false
+				}
+				let indexLoad = layer.load(2)
+				$.post(url, params, function(data) {
+					if (data == true) {
+						layer.close(indexLoad)
+						layer.close(index)
+						location.reload()
+					}
+				})
+			})
+		}
+
+		/* 导航激活 */
+		$(".nav li").removeClass("active")
+		$(".nav li").eq(0).addClass("active")
+	</script>
+</block>
