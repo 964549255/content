@@ -1,0 +1,137 @@
+<extend name="common/frame" />
+
+<!-- 区块-标题 -->
+<block name="title">
+	栏目管理
+</block>
+
+<!-- 区块-样式 -->
+<block name="style">
+
+</block>
+
+<!-- 区块-内容 -->
+<block name="content">
+	<table class="table table-bordered table-hover">
+		<colgroup>
+			<col width="5%">
+			<col width="10%">
+			<col width="5%">
+			<col width="20%">
+			<col width="10%">
+			<col width="10%">
+			<col width="10%">
+			<col width="20%">
+		</colgroup>
+		<thead>
+			<tr>
+				<th><input type="checkbox" id="all" onchange="changeAll()"></th>
+				<th>栏目排序</th>
+				<th>栏目编号</th>
+				<th>栏目名称</th>
+				<th>栏目类型</th>
+				<th>所属模型</th>
+				<th>栏目状态</th>
+				<th><button class="btn btn-success" type="button" onclick="add(0)">添加栏目</button></th>
+			</tr>
+		</thead>
+		<tbody>
+			<script type="text/javascript">
+				/* 初始化栏目 */
+				let datas = {$datas | json_encode};
+
+				function initDatas(datas, text) {
+					$.each(datas, function(index, data) {
+						text +=
+							`
+						<tr>
+							<td><input type="checkbox" name="deleteId" value="${data.id}"></td>
+							<td><input type="text" class="form-control text-center" value="${data.sort}" onchange="changeSort(this, ${data.id}, '{:cmf_plugin_url('Content://admin_category/changeSort')}')"></td>
+							<td>${data.id}</td>
+							<td class="text-left">${data.prefix}${data.name}</td>
+							<td>${data.type_text}</td>
+							<td>${data.category_id.name}</td>
+							<td>
+							`
+						switch (parseInt(data.status)) {
+							case 1:
+								text +=
+									`<button class="btn btn-warning" type="button" onclick="changeStatus(2, ${data.id}, '{:cmf_plugin_url('Content://admin_category/changeStatus')}', '确认禁用栏目?')">禁用栏目</button>`
+								break;
+							case 2:
+								text +=
+									`<button class="btn btn-success" type="button" onclick="changeStatus(1, ${data.id}, '{:cmf_plugin_url('Content://admin_category/changeStatus')}', '确认启用栏目?')">启用栏目</button>`
+								break;
+						}
+						text +=
+							`
+							</td>
+							<td>
+								<button class="btn btn-default" type="button" onclick="add(${data.id})">添加子栏目</button>
+								<button class="btn btn-primary" type="button" onclick="edit(${data.id})">修改栏目</button>
+								<button class="btn btn-danger" type="button" onclick="destroy(${data.id}, '{:cmf_plugin_url('Content://admin_category/destroy')}', '确认删除栏目?')">删除栏目</button>
+							</td>
+						</tr>
+						`
+						if (data.hasCategorys) {
+							text = initDatas(data.categorys, text)
+						}
+					})
+					return text
+				}
+
+				$("tbody").html(initDatas(datas, ""))
+			</script>
+		</tbody>
+	</table>
+	<div class="row">
+		<div class="col-md-2">
+			<button class="btn btn-danger" type="button" onclick="deleteAll('{:cmf_plugin_url('Content://admin_category/deleteAll')}', '确认删除选中?')">删除选中</button>
+		</div>
+	</div>
+</block>
+
+<!-- 区块-脚本 -->
+<block name="script">
+	<script type="text/javascript">
+		/* 添加栏目 */
+		function add(id) {
+			let title = "栏目添加"
+			let url = `{:cmf_plugin_url('Content://admin_category/add')}?id=${id}`
+			iframe(title, url, function(index, layero) {
+				let form = layer.getChildFrame("form", index)
+				let iframeWin = window[layero.find('iframe')[0]['name']]
+				let params = {
+					submit: "submit",
+					params: {
+						name: form.find("#name").val(),
+						category_id: form.find("#category_id").val()
+					}
+				}
+				if (isNull(params.params.name)) {
+					msg("栏目名称为空")
+					return false
+				}
+				let indexLoad = layer.load(2)
+				$.post(url, params, function(data) {
+					if (data == true) {
+						layer.close(indexLoad)
+						layer.close(index)
+						location.reload()
+					}
+				})
+			})
+		}
+
+		/* 修改栏目 */
+		function edit(id) {
+			let title = "栏目修改"
+			let url = `{:cmf_plugin_url('Content://admin_category/edit')}?id=${id}`
+			
+		}
+
+		/* 导航激活 */
+		$(".nav li").removeClass("active")
+		$(".nav li").eq(1).addClass("active")
+	</script>
+</block>
